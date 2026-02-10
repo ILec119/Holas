@@ -2,10 +2,13 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>💖 Jugar contigo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>💜 Jugar contigo</title>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -14,13 +17,13 @@
 body {
   margin: 0;
   height: 100vh;
-  background: linear-gradient(120deg, #ffb6c1, #dcb0ff, #a0e7ff);
+  background: linear-gradient(135deg, #c77dff, #9d4edd, #f3c4fb);
   background-size: 300% 300%;
-  animation: fondo 7s ease infinite;
+  animation: fondo 10s ease infinite;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'Comic Sans MS', cursive;
+  font-family: 'Poppins', sans-serif;
   overflow: hidden;
 }
 
@@ -33,66 +36,58 @@ body {
 .card {
   width: 90%;
   max-width: 360px;
-  background: rgba(255,255,255,0.97);
-  padding: 25px 20px;
+  background: rgba(255,255,255,0.96);
+  padding: 28px 22px;
   border-radius: 28px;
   text-align: center;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.25);
-  animation: flotar 3s ease-in-out infinite;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  animation: flotar 4s ease-in-out infinite;
 }
 
 @keyframes flotar {
   0%,100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
 
 h1 {
-  font-size: 1.6rem;
-  color: #ff4f9a;
-  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: #7b2cbf;
+  margin-bottom: 25px;
   line-height: 1.35;
 }
 
 .buttons {
   position: relative;
-  height: 150px;
+  height: 160px;
 }
 
 button {
-  width: 140px;
-  max-width: 48vw;
   border: none;
   border-radius: 999px;
-  padding: 14px;
-  font-size: 1.15rem;
+  padding: 14px 26px;
+  font-size: 1.05rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: all 0.35s ease;
 }
 
 #yes {
-  background: linear-gradient(135deg, #ff5fa2, #ff9a9e);
+  background: linear-gradient(135deg, #9d4edd, #c77dff);
   color: white;
-  z-index: 2;
+  box-shadow: 0 8px 20px rgba(157,78,221,0.45);
+}
+
+#yes:active {
+  transform: scale(0.95);
 }
 
 #no {
-  background: linear-gradient(135deg, #b0b0b0, #dedede);
-  color: #444;
+  background: #e0d4ff;
+  color: #5a189a;
   position: absolute;
   right: 0;
   top: 70px;
-}
-
-.sticker {
-  position: absolute;
-  font-size: 2rem;
-  animation: caer 6s linear forwards;
-  pointer-events: none;
-}
-
-@keyframes caer {
-  from { transform: translateY(-60px); opacity: 1; }
-  to { transform: translateY(120vh); opacity: 0; }
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
 </style>
 </head>
@@ -100,75 +95,61 @@ button {
 <body>
 
 <div class="card">
-  <h1>¿Quieres jugar conmigo<br>Mai-Chan? 💕</h1>
+  <h1>¿Quieres jugar conmigo<br>Mai-Chan? 💜✨</h1>
 
   <div class="buttons">
-    <button id="yes" onclick="acepta()">Sí 💖</button>
-    <button id="no" onclick="rechaza()">No 😐</button>
+    <button id="yes" onclick="acepta()">Sí 💜</button>
+    <button id="no" onclick="rechaza()">No 🥺</button>
   </div>
 </div>
-
-<audio id="pop" src="https://assets.mixkit.co/sfx/preview/mixkit-game-click-1114.mp3"></audio>
 
 <script>
 let veces = 0;
 const yes = document.getElementById("yes");
 const no = document.getElementById("no");
-const pop = document.getElementById("pop");
-
-function vibrar() {
-  if (navigator.vibrate) navigator.vibrate(60);
-}
 
 function rechaza() {
   veces++;
-  pop.play();
-  vibrar();
 
-  let scale = 1 + veces * 0.4;
-  yes.style.transform = `scale(${scale})`;
+  // El NO se hace más pequeño
+  let scaleNo = Math.max(0.6, 1 - veces * 0.15);
+  no.style.transform = `scale(${scaleNo})`;
 
-  no.style.transform = `translateX(${Math.random()*40 - 20}px)`;
+  // Se mueve de lado a lado
+  const x = Math.random() * 120 - 60;
+  const y = Math.random() * 40 - 20;
+  no.style.transform += ` translate(${x}px, ${y}px)`;
 
-  if (veces === 3) {
-    no.style.left = "0";
-    no.style.right = "auto";
-  }
+  // El SÍ crece suavemente
+  let scaleYes = 1 + veces * 0.25;
+  yes.style.transform = `scale(${scaleYes})`;
 
-  if (veces >= 4) {
-    yes.innerHTML = "Shi 🥹?";
-    no.innerHTML = "¿Cómo que no?";
+  if (veces >= 3) {
+    no.innerText = "¿Cómo que no? 😵‍💫";
   }
 }
 
 function acepta() {
-  vibrar();
-  pop.play();
   document.body.innerHTML = `
     <div style="
       height:100vh;
       display:flex;
+      flex-direction:column;
       justify-content:center;
       align-items:center;
       text-align:center;
-      padding:20px;
-      font-size:2.4rem;
+      background:linear-gradient(135deg,#9d4edd,#c77dff);
       color:white;
-      background:linear-gradient(135deg,#ff6aa2,#b983ff);">
-      Yaaaay 😭💖<br>Vamos a jugar ✨
+      font-family:'Poppins',sans-serif;
+      padding:20px;">
+      
+      <div style="font-size:4rem;">😄🌹</div>
+      <div style="font-size:2rem; margin-top:15px;">
+        Sabía que dirías que sí 😉
+      </div>
     </div>
   `;
 }
-
-const emojis = ["💖","🌸","🐱","🍓","⭐","🎀"];
-setInterval(() => {
-  const s = document.createElement("div");
-  s.className = "sticker";
-  s.innerText = emojis[Math.floor(Math.random()*emojis.length)];
-  s.style.left = Math.random()*100 + "vw";
-  document.body.appendChild(s);
-  setTimeout(()=>s.remove(),6000);
-}, 800);
 </script>
 
 </body>
