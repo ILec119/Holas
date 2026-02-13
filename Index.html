@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Galaxia 3D</title>
+<style>
+    body { margin: 0; overflow: hidden; background: black; }
+</style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+<script>
+const scene = new THREE.Scene();
+
+const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
+);
+camera.position.z = 80;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// ✨ Postprocesado (Bloom)
+const composer = new THREE.EffectComposer(renderer);
+composer.addPass(new THREE.RenderPass(scene, camera));
+
+const bloomPass = new THREE.UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    1.2,  // intensidad
+    0.4,  // radio
+    0.85  // threshold
+);
+composer.addPass(bloomPass);
+
+// 🌌 Parámetros de galaxia
+const params = {
+    estrellas: 15000,
+    radio: 35,
+    brazos: 4,
+    curvatura: 0.45,
+    dispersion: 0.35
+};
+
+const geometry = new THREE.BufferGeometry();
+const positions = [];
+const colors = [];
+
+for (let i = 0; i < params.estrellas; i++) {
+
+    const r = Math.random() * params.radio;
+    const brazo = i % params.brazos;
+    const anguloBase = (brazo / params.brazos) * Math.PI * 2;
+
+    const angulo = anguloBase + r * params.curvatura;
+
+    const randomOffset = (Math.random() - 0.5) * params.dispersion * r;
+
+    const x = Math.cos(angulo) * r + randomOffset;
+    const y = (Math.random() - 0.5) * 2;
+    const z = Math.sin(angulo) * r + randomOffset;
+
+    positions.push(x, y, z);
+
+    // 🎨 Color realista (núcleo → borde)
+    const color = new THREE.Color();
+
+    const mix = r / params.radio;
+
+    color.setRGB(
+        1.0,
+        0.8 - mix * 0.6,
+        1.0 - mix * 0.8
+    );
+
+    colors.push(color.r, color.g, color.b);
+}
+
+geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(positions, 3)
+);
+
+geometry.setAttribute(
+    "color",
+    new THREE.Float32BufferAttribute(colors, 3)
+);
+
+const material = new THREE.PointsMaterial({
+    size: 0.12,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.9,
+    depthWrite: false
+});
+
+const galaxy = new THREE.Points(geometry, material);
+scene.add(galaxy);
+
+// ✨ Núcleo brillante
+const coreGeometry = new THREE.SphereGeometry(2.5, 32, 32);
+const coreMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffddff
+});
+const core = new THREE.Mesh(coreGeometry, coreMaterial);
+scene.add(core);
+
+// 💫 Animación
+function animate() {
+    requestAnimationFrame(animate);
+
+    galaxy.rotation.y += 0.0008;
+    galaxy.rotation.x += 0.0002;
+
+    composer.render();
+}
+animate();
+
+// 📐 Resize
+window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body>
+</html>
